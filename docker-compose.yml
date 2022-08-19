@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: teszt
+      MYSQL_USER: teszt
+      MYSQL_PASSWORD: teszt
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+  teszt:
+    image: teszt
+    ports:
+      - 8080:8080
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    healthcheck:
+      test: curl --fail http://127.0.0.1 || exit 1
+      interval: 10s
+      retries: 5
+      timeout: 10s
+    environment:
+      DB_URL: 'jdbc:mysql://db/teszt'
+      DB_UNAME: 'teszt'
+      DB_PW: 'teszt'
+      DB_DIALECT: 'org.hibernate.dialect.MySQL5Dialect'
+      DDL_AUTO: 'create-drop'
